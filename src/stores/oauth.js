@@ -43,8 +43,6 @@ export default {
     },
     setToken(state, token) {
       state.token = token;
-      Cookies.set('token', token);
-      console.log('トークン取得完了');
     }
   },
   actions: {
@@ -67,10 +65,10 @@ export default {
         throw error.response.status;
       }
     },
-    async fetchCode() {
+    async fetchCode({ state }) {
       const getParams = {
         response_type: 'code',
-        client_id: Cookies.get('client_id'),
+        client_id: state.client_id,
         redirect_uri: REDIRECT_URI,
         scope: API_SCOPE
       };
@@ -80,15 +78,12 @@ export default {
       authUrl.search = qs.stringify(getParams);
       document.location = authUrl.href;
     },
-    setCookieCode({ code }) {
-      Cookies.set('code', code);
-    },
-    async fetchToken({ commit }) {
+    async fetchToken({ commit, state }) {
       const postParams = {
-        client_id: Cookies.get('client_id'),
-        client_secret: Cookies.get('client_secret'),
+        client_id: state.client_id,
+        client_secret: state.client_secret,
         grant_type: 'authorization_code',
-        code: Cookies.get('code'),
+        code: state.code,
         redirect_uri: REDIRECT_URI
       };
 

@@ -20,9 +20,12 @@
     methods: {
       ...mapActions({
         fetchClient: 'oauth/fetchClient',
-        fetchCode: 'oauth/fetchCode',
-        fetchToken: 'oauth/fetchToken',
-      })
+        fetchCode: 'oauth/fetchCode'
+      }),
+      fetchToken() {
+        this.$store.dispatch('oauth/fetchToken');
+        this.$store.commit('account/setToken', this.$store.state.oauth.token);
+      }
     }
   }
 </script>

@@ -1,9 +1,13 @@
 <template>
-  <div class="toots">
+  <div>
     <h1>タイムライン</h1>
-    <ul>
+    <ul class="toots">
       <li v-for="toot in timeline" v-bind:key="toot.id">
-        {{ toot.title }}
+        <dl class="toots__toot">
+          <dt class="toots__title">{{ toot.account.display_name }}</dt>
+          <dd v-html="toot.content"></dd>
+        </dl>
+
       </li>
     </ul>
   </div>
@@ -25,3 +29,18 @@
     }
   }
 </script>
+
+<style scoped lang="scss">
+  .toots {
+    width: 500px;
+    text-align: left;
+    margin: 0 auto;
+  }
+  .toots__toot {
+    background: #eee;
+    padding: 20px;
+  }
+  .toots__title {
+    font-weight: bold;
+  }
+</style>
