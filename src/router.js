@@ -29,9 +29,9 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Callback.vue')
     },
     {
-      path: '/toots',
-      name: 'toots',
-      component: () => import(/* webpackChunkName: "about" */ './views/Toots.vue')
+      path: '/timeline',
+      name: 'timeline',
+      component: () => import(/* webpackChunkName: "about" */ './views/Timeline.vue')
     }
   ]
 })

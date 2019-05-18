@@ -3,7 +3,7 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/oauth">認証</router-link> |
-      <router-link to="/toots">トゥート一覧</router-link>
+      <router-link to="/timeline">タイムライン</router-link>
     </div>
     <router-view/>
   </div>

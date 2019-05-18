@@ -1,5 +1,6 @@
 import axios from 'axios'
 import qs from 'qs';
+import Cookies from 'js-cookie';
 
 const MASTODON_URL = 'https://gingadon.com';
 const API_SCOPE = 'read write';
@@ -12,21 +13,38 @@ export default {
   state: {
     client_id: '',
     client_secret: '',
+    code: '',
     token: '',
     error: {}
   },
   mutations: {
     setError(state, error) {
       state.error = error;
-      alert('エラー発生');
+      console.log('エラー発生');
+    },
+    restoreStorage(state) {
+      state.client_id = Cookies.get('client_id');
+      state.client_secret = Cookies.get('client_secret');
+      state.code = Cookies.get('code');
+      state.token = Cookies.get('token');
+      console.log('復元完了');
     },
     setClient(state, response) {
       state.client_id = response.client_id;
       state.client_secret = response.client_secret;
-      alert('クライアント取得完了');
+      Cookies.set('client_id', response.client_id);
+      Cookies.set('client_secret', response.client_secret);
+      console.log('クライアント取得完了');
+    },
+    setCode(state, code) {
+      state.code = code;
+      Cookies.set('code', code);
+      console.log('コード取得完了');
     },
     setToken(state, token) {
       state.token = token;
+      Cookies.set('token', token);
+      console.log('トークン取得完了');
     }
   },
   actions: {
@@ -49,10 +67,10 @@ export default {
         throw error.response.status;
       }
     },
-    async fetchToken({ state }) {
+    async fetchCode() {
       const getParams = {
         response_type: 'code',
-        client_id: state.client_id,
+        client_id: Cookies.get('client_id'),
         redirect_uri: REDIRECT_URI,
         scope: API_SCOPE
       };
@@ -61,6 +79,29 @@ export default {
       const authUrl = new URL( `${MASTODON_URL}/oauth/authorize`);
       authUrl.search = qs.stringify(getParams);
       document.location = authUrl.href;
+    },
+    setCookieCode({ code }) {
+      Cookies.set('code', code);
+    },
+    async fetchToken({ commit }) {
+      const postParams = {
+        client_id: Cookies.get('client_id'),
+        client_secret: Cookies.get('client_secret'),
+        grant_type: 'authorization_code',
+        code: Cookies.get('code'),
+        redirect_uri: REDIRECT_URI
+      };
+
+      try {
+        await axios.post(`${MASTODON_URL}/oauth/token`, postParams)
+          .then(response => {
+            commit('setToken', response.data.access_token);
+            return response.status;
+          })
+      } catch (error) {
+        commit('setError', error.response.data);
+        throw error.response.status;
+      }
     }
   }
 }
