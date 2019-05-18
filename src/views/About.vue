@@ -1,6 +1,7 @@
 <template>
   <div class="about">
-    <h1>This is an about page {{ test }}</h1>
+    <h1>Vue製 マストドン クライアント</h1>
+    <p>認証、一覧表示、トゥート</p>
   </div>
 </template>
 
