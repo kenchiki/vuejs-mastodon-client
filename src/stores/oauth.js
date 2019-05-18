@@ -20,7 +20,7 @@ export default {
   mutations: {
     setError(state, error) {
       state.error = error;
-      console.log('エラー発生');
+      alert('エラー発生');
     },
     restoreStorage(state) {
       state.client_id = Cookies.get('client_id');
@@ -34,12 +34,12 @@ export default {
       state.client_secret = response.client_secret;
       Cookies.set('client_id', response.client_id);
       Cookies.set('client_secret', response.client_secret);
-      console.log('クライアント取得完了');
+      alert('クライアント取得完了');
     },
     setCode(state, code) {
       state.code = code;
       Cookies.set('code', code);
-      console.log('コード取得完了');
+      alert('コード取得完了');
     },
     setToken(state, token) {
       state.token = token;

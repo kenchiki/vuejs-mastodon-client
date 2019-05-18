@@ -15,7 +15,7 @@ export default  {
     setToken(state, token) {
       state.token = token;
       Cookies.set('token', token);
-      console.log('トークン取得完了');
+      alert('トークン取得完了');
     },
     restoreStorage(state) {
       state.token = Cookies.get('token');
