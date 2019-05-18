@@ -9,6 +9,10 @@ export default  {
     timeline: []
   },
   mutations: {
+    setError(state, error) {
+      state.error = error;
+      alert('エラー発生');
+    },
     setTimeline(state, timeline) {
       state.timeline = timeline
     },
@@ -29,6 +33,24 @@ export default  {
       }).then(response => {
         commit('setTimeline', response.data)
       })
+    },
+    async toot({ dispatch, state, commit }, { status }) {
+      const postParams = {
+        status: status,
+      };
+
+      // https://docs.joinmastodon.org/api/rest/statuses/
+      try {
+        await axios.post(`${MASTODON_URL}/api/v1/statuses`, postParams,{
+          headers: {'Authorization': `Bearer ${state.token}`}
+        })
+          .then(response => {
+            dispatch('fetchTimeline')
+          })
+      } catch (error) {
+        commit('setError', error.response.data);
+        throw error.response.status;
+      }
     },
   }
 }
