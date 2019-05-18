@@ -8,15 +8,11 @@
 </template>
 
 <script>
-  import {mapActions, mapState} from 'vuex';
+  import {mapActions} from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
 
   export default {
     mixins: [storageRestorable],
-    computed: {
-      ...mapState({
-      })
-    },
     methods: {
       ...mapActions({
         fetchClient: 'oauth/fetchClient',
