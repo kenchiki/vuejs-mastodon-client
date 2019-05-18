@@ -1,4 +1,6 @@
-# vue-test
+# 概要
+
+MastodonクライアントをVue Cliで作成
 
 ## Project setup
 ```
