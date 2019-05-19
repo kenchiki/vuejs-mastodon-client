@@ -26,6 +26,11 @@
 
   export default {
     mixins: [storageRestorable],
+    data: function () {
+      return {
+        status: ''
+      }
+    },
     computed: {
       ...mapState({
         timeline: state => state.account.timeline
@@ -39,6 +44,7 @@
     },
     created() {
       this.$store.dispatch('account/fetchTimeline');
+      this.$store.dispatch('account/streamingTimeline');
     }
   }
 </script>

@@ -40,7 +40,18 @@ export default {
         commit('setTimeline', response.data);
       })
     },
-    async createToot({dispatch, state, commit}, {status}) {
+    streamingTimeline({ state }) {
+      //https://docs.joinmastodon.org/api/streaming/#get-api-v1-streaming-user
+      const socket = new WebSocket(`ws://localhost:4000/api/v1/streaming/?stream=user&access_token=${state.token}`);
+      socket.addEventListener('message', function (event) {
+        const responce = JSON.parse(event.data);
+        if(responce.event === 'update') {
+          state.timeline.unshift(JSON.parse(responce.payload));
+          console.log('Message from server ', responce);
+        }
+      });
+    },
+    async createToot({state, commit}, {status}) {
       const postParams = {
         status: status,
       };
@@ -51,10 +62,6 @@ export default {
           headers: {'Authorization': `Bearer ${state.token}`}
         }).then(response => {
           console.log(response.statusText);
-          // ローカル環境ではpostした直後にタイムラインを取得してもpostしたトゥートを含んだタイムラインが取得できないため、少し時間を空ける
-          setTimeout(() => {
-            dispatch('fetchTimeline');
-          }, 200);
         })
       } catch (error) {
         commit('setError', error.response.data);
