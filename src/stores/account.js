@@ -16,18 +16,20 @@ export default {
     setTimeline(state, timeline) {
       state.timeline = timeline
     },
-    setToken(state, token) {
-      state.token = token;
-      Cookies.set('token', token);
-      alert('トークン取得完了');
-    },
-    setMastodonUrl(state, mastodonUrl) {
-      state.mastodon_url = mastodonUrl;
+    setOauth(state, oauth) {
+      state.token = oauth.token;
+      state.mastodon_url = oauth.mastodon_url;
+      Cookies.set('token', oauth.token);
     },
     restoreStorage(state) {
       state.token = Cookies.get('token');
       state.mastodon_url = Cookies.get('mastodon_url');
       console.log('復元完了');
+    },
+    clearStorage(state) {
+      state.token = '';
+      state.mastodon_url = '';
+      Cookies.remove('token');
     },
   },
   actions: {

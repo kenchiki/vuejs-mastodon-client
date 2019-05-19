@@ -39,9 +39,7 @@ export default {
       Cookies.remove('client_id');
       Cookies.remove('client_secret');
       Cookies.remove('code');
-      Cookies.remove('token');
       Cookies.remove('mastodon_url');
-      console.log('ストレージ削除');
     },
     setClient(state, response) {
       state.client_id = response.client_id;
@@ -49,12 +47,11 @@ export default {
       Cookies.set('client_id', response.client_id);
       Cookies.set('client_secret', response.client_secret);
       Cookies.set('mastodon_url', state.mastodon_url);
-      alert('クライアント取得完了');
+
     },
     setCode(state, code) {
       state.code = code;
       Cookies.set('code', code);
-      alert('コード取得完了');
     },
     setToken(state, token) {
       state.token = token;

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import {mapActions, mapState, mapMutations } from 'vuex';
+  import { mapState } from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
 
   export default {
@@ -26,17 +26,25 @@
       })
     },
     methods: {
-      ...mapActions({
-        fetchClient: 'oauth/fetchClient',
-        fetchCode: 'oauth/fetchCode'
-      }),
-      ...mapMutations({
-        clearStorage: 'oauth/clearStorage'
-      }),
+      fetchClient() {
+        this.$store.dispatch('oauth/fetchClient').then(statusCode => {
+          alert('クライアント取得完了');
+        });
+      },
+      fetchCode() {
+        this.$store.dispatch('oauth/fetchCode').then(statusCode => {
+          alert('コード取得完了');
+        });
+      },
+      clearStorage() {
+        this.$store.commit('oauth/clearStorage');
+        this.$store.commit('account/clearStorage');
+        alert('ストレージ削除');
+      },
       fetchToken() {
         this.$store.dispatch('oauth/fetchToken').then(statusCode => {
-          this.$store.commit('account/setToken', this.$store.state.oauth.token);
-          this.$store.commit('account/setMastodonUrl', this.$store.state.oauth.mastodon_url);
+          this.$store.commit('account/setOauth', this.$store.state.oauth);
+          alert('トークン取得完了');
         });
       }
     }
