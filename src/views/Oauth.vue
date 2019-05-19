@@ -10,24 +10,38 @@
       <input type="button" value="トークン取得" v-on:click="fetchToken">
       <input type="button" value="認証情報を削除" v-on:click="clearStorage">
     </p>
-
+    <ul>
+      <li v-show="client_id">client ok!</li>
+      <li v-show="code">code ok!</li>
+      <li v-show="token">token ok!</li>
+    </ul>
   </div>
 </template>
 
 <script>
-  import { mapState } from 'vuex';
+  import { mapState, mapMutations } from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
 
   export default {
     mixins: [storageRestorable],
     computed: {
       ...mapState({
-        mastodon_url: state => state.oauth.mastodon_url
-      })
+        client_id: state => state.oauth.client_id,
+        code: state => state.oauth.code,
+        token: state => state.oauth.token,
+      }),
+      mastodon_url: {
+        get () {
+          return this.$store.state.oauth.mastodon_url
+        },
+        set (value) {
+          this.$store.commit('oauth/updateMastodonUrl', value);
+        }
+      }
     },
     methods: {
       fetchClient() {
-        this.$store.dispatch('oauth/fetchClient').then(statusCode => {
+        this.$store.dispatch('oauth/fetchClient', { mastodon_url: this.mastodon_url }).then(statusCode => {
           alert('クライアント取得完了');
         });
       },
