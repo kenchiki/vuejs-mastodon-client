@@ -40,7 +40,7 @@ export default {
         commit('setTimeline', response.data);
       })
     },
-    async toot({dispatch, state, commit}, {status}) {
+    async createToot({dispatch, state, commit}, {status}) {
       const postParams = {
         status: status,
       };

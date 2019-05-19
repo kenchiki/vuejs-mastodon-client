@@ -2,10 +2,10 @@
   <div class="timeline">
     <div class="new-toot">
       <p>
-        <textarea v-model="toot.status" class="new-toot__status"></textarea>
+        <textarea v-model="status" class="new-toot__status"></textarea>
       </p>
       <p>
-        <input type="button" value="トゥート！" v-on:click="toot">
+        <input type="button" value="トゥート！" v-on:click="createToot">
       </p>
     </div>
 
@@ -32,9 +32,9 @@
       })
     },
     methods: {
-      toot() {
-        this.$store.dispatch('account/toot', { status: this.toot.status });
-        this.toot.status = '';
+      createToot() {
+        this.$store.dispatch('account/createToot', { status: this.status });
+        this.status = '';
       }
     },
     created() {
