@@ -45,6 +45,9 @@
     created() {
       this.$store.dispatch('account/fetchTimeline');
       this.$store.dispatch('account/streamingTimeline');
+    },
+    destroyed() {
+      this.$store.commit('account/disconnectSocket');
     }
   }
 </script>

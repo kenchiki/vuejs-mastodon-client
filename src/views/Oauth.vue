@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex';
+  import { mapState } from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
 
   export default {

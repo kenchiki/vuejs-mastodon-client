@@ -6,6 +6,7 @@ export default {
   state: {
     timeline: [],
     token: '',
+    socket: null,
     mastodon_url: ''
   },
   mutations: {
@@ -20,6 +21,13 @@ export default {
       state.token = oauth.token;
       state.mastodon_url = oauth.mastodon_url;
       Cookies.set('token', oauth.token);
+    },
+    setSocket(state, socket) {
+      state.socket = socket;
+    },
+    disconnectSocket(state) {
+      state.socket.close();
+      state.socket = null;
     },
     restoreStorage(state) {
       state.token = Cookies.get('token');
@@ -40,7 +48,7 @@ export default {
         commit('setTimeline', response.data);
       })
     },
-    streamingTimeline({ state }) {
+    streamingTimeline({ commit, state }) {
       //https://docs.joinmastodon.org/api/streaming/#get-api-v1-streaming-user
       const socket = new WebSocket(`ws://localhost:4000/api/v1/streaming/?stream=user&access_token=${state.token}`);
       socket.addEventListener('message', function (event) {
@@ -50,6 +58,7 @@ export default {
           console.log('Message from server ', responce);
         }
       });
+      commit('setSocket', socket);
     },
     async createToot({state, commit}, {status}) {
       const postParams = {
