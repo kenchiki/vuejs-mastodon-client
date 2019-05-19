@@ -2,7 +2,6 @@ import axios from 'axios'
 import qs from 'qs';
 import Cookies from 'js-cookie';
 
-const MASTODON_URL = 'https://gingadon.com';
 const API_SCOPE = 'read write';
 
 // client、tokenどちらを取得する際も同一のものを指定する必要あり（認証のところで無効と表示されてしまうため）
@@ -15,6 +14,7 @@ export default {
     client_secret: '',
     code: '',
     token: '',
+    mastodon_url: '',
     error: {}
   },
   mutations: {
@@ -27,13 +27,28 @@ export default {
       state.client_secret = Cookies.get('client_secret');
       state.code = Cookies.get('code');
       state.token = Cookies.get('token');
-      console.log('復元完了');
+      state.mastodon_url = Cookies.get('mastodon_url') || 'http://localhost:3000';
+      console.log('ストレージ復元');
+    },
+    clearStorage(state) {
+      state.client_id = '';
+      state.client_secret = '';
+      state.code = '';
+      state.token = '';
+      state.mastodon_url = '';
+      Cookies.remove('client_id');
+      Cookies.remove('client_secret');
+      Cookies.remove('code');
+      Cookies.remove('token');
+      Cookies.remove('mastodon_url');
+      console.log('ストレージ削除');
     },
     setClient(state, response) {
       state.client_id = response.client_id;
       state.client_secret = response.client_secret;
       Cookies.set('client_id', response.client_id);
       Cookies.set('client_secret', response.client_secret);
+      Cookies.set('mastodon_url', state.mastodon_url);
       alert('クライアント取得完了');
     },
     setCode(state, code) {
@@ -46,7 +61,7 @@ export default {
     }
   },
   actions: {
-    async fetchClient({commit}) {
+    async fetchClient({ commit, state }) {
       const postParams = {
         client_name: 'vue test',
         redirect_uris: REDIRECT_URI,
@@ -55,7 +70,7 @@ export default {
 
       // https://docs.joinmastodon.org/api/rest/apps/#post-api-v1-apps
       try {
-        await axios.post(`${MASTODON_URL}/api/v1/apps`, postParams)
+        await axios.post(`${state.mastodon_url}/api/v1/apps`, postParams)
           .then(response => {
             commit('setClient', response.data);
             return response.status;
@@ -74,7 +89,7 @@ export default {
       };
 
       // https://docs.joinmastodon.org/api/authentication/#get-oauth-authorize
-      const authUrl = new URL( `${MASTODON_URL}/oauth/authorize`);
+      const authUrl = new URL( `${state.mastodon_url}/oauth/authorize`);
       authUrl.search = qs.stringify(getParams);
       document.location = authUrl.href;
     },
@@ -88,7 +103,7 @@ export default {
       };
 
       try {
-        await axios.post(`${MASTODON_URL}/oauth/token`, postParams)
+        await axios.post(`${state.mastodon_url}/oauth/token`, postParams)
           .then(response => {
             commit('setToken', response.data.access_token);
             return response.status;
