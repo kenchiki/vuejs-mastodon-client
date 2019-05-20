@@ -42,11 +42,13 @@
     methods: {
       fetchClient() {
         this.$store.dispatch('oauth/fetchClient', { mastodon_url: this.mastodon_url }).then(statusCode => {
+          console.log(statusCode);
           alert('クライアント取得完了');
         });
       },
       fetchCode() {
         this.$store.dispatch('oauth/fetchCode').then(statusCode => {
+          console.log(statusCode);
           alert('コード取得完了');
         });
       },
@@ -58,6 +60,7 @@
       fetchToken() {
         this.$store.dispatch('oauth/fetchToken').then(statusCode => {
           this.$store.commit('account/setOauth', this.$store.state.oauth);
+          console.log(statusCode);
           alert('トークン取得完了');
         });
       }

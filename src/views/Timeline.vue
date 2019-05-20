@@ -5,6 +5,9 @@
         <textarea v-model="status" class="new-toot__status"></textarea>
       </p>
       <p>
+        <input type="file" name="my_file">
+      </p>
+      <p>
         <input type="button" value="トゥート！" v-on:click="createToot">
       </p>
     </div>
@@ -21,7 +24,7 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex';
+  import {mapState} from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
 
   export default {
@@ -38,7 +41,7 @@
     },
     methods: {
       createToot() {
-        this.$store.dispatch('account/createToot', { status: this.status });
+        this.$store.dispatch('account/createToot', {status: this.status});
         this.status = '';
       }
     },
@@ -62,15 +65,18 @@
       padding: 0;
     }
   }
+
   .toots {
     width: 100%;
     text-align: left;
     list-style: none;
   }
+
   .toots__toot {
     background: #eee;
     padding: 20px;
   }
+
   .toots__title {
     font-weight: bold;
   }
