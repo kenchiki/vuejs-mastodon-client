@@ -1,11 +1,14 @@
 <template>
   <div class="timeline">
+    <div class="error" v-if="error">
+      {{ error.response.data.error }}
+    </div>
     <div class="new-toot">
       <p>
         <textarea v-model="status" class="new-toot__status"></textarea>
       </p>
       <p>
-        <input type="file" name="my_file">
+        <input type="file" :value="file" @change="uploadFile">
       </p>
       <p>
         <input type="button" value="トゥート！" v-on:click="createToot">
@@ -31,26 +34,43 @@
     mixins: [storageRestorable],
     data: function () {
       return {
-        status: ''
+        status: '',
+        file: '',
+        error: null
       }
     },
     computed: {
       ...mapState({
-        timeline: state => state.account.timeline
+        timeline: state => state.timeline.timeline
       })
     },
     methods: {
-      createToot() {
-        this.$store.dispatch('account/createToot', {status: this.status});
+      async createToot() {
+        await this.$store.dispatch('toot/create', {
+          status: this.status,
+          oauth: this.$store.state.oauth,
+        });
+        this.error = this.$store.state.toot.error;
         this.status = '';
+      },
+      uploadFile(e) {
+        e.preventDefault();
+        const file = e.target.files[0];
+        this.$store.dispatch('toot/uploadFile', {file: file});
+        // TODO:選択状態を空にして、添付された画像一覧を表示したい
+        this.file = '';
       }
     },
     created() {
-      this.$store.dispatch('account/fetchTimeline');
-      this.$store.dispatch('account/streamingTimeline');
+      this.$store.dispatch('timeline/fetchTimeline', {
+        oauth: this.$store.state.oauth,
+      });
+      this.$store.dispatch('timeline/streamingTimeline', {
+        oauth: this.$store.state.oauth,
+      });
     },
     destroyed() {
-      this.$store.commit('account/disconnectSocket');
+      this.$store.commit('timeline/disconnectSocket');
     }
   }
 </script>

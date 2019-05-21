@@ -3,12 +3,14 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-import account from './stores/account';
+import timeline from './stores/timeline';
 import oauth from './stores/oauth';
+import toot from './stores/toot';
 
 export default new Vuex.Store({
   modules: {
-    account: account,
-    oauth: oauth
+    timeline: timeline,
+    oauth: oauth,
+    toot: toot
   }
 });

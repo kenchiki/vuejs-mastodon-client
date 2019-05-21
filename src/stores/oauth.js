@@ -56,6 +56,7 @@ export default {
     },
     setToken(state, token) {
       state.token = token;
+      Cookies.set('token', token);
     },
     updateMastodonUrl(state, mastodon_url) {
       state.mastodon_url = mastodon_url;
