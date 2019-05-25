@@ -7,8 +7,13 @@
       <p>
         <textarea v-model="status" class="new-toot__status"></textarea>
       </p>
+      <ul class="medias" v-if="medias.length">
+        <li v-for="media in medias" v-bind:key="media.id">
+          <img v-bind:src="media.preview_url" alt="">
+        </li>
+      </ul>
       <p>
-        <input type="file" :value="file" @change="uploadFile">
+        <input type="file" @change="uploadFile">
       </p>
       <p>
         <input type="button" value="トゥート！" v-on:click="createToot">
@@ -20,6 +25,11 @@
         <dl class="toots__toot">
           <dt class="toots__title">{{ toot.account.display_name }}</dt>
           <dd v-html="toot.content"></dd>
+          <ul class="medias" v-if="toot.media_attachments.length">
+            <li v-for="media in toot.media_attachments" v-bind:key="media.id">
+              <img v-bind:src="media.preview_url" alt="">
+            </li>
+          </ul>
         </dl>
       </li>
     </ul>
@@ -35,30 +45,33 @@
     data: function () {
       return {
         status: '',
-        file: '',
         error: null
       }
     },
     computed: {
       ...mapState({
-        timeline: state => state.timeline.timeline
+        timeline: state => state.timeline.timeline,
+        medias: state => state.toot.medias
       })
     },
     methods: {
       async createToot() {
         await this.$store.dispatch('toot/create', {
-          status: this.status,
           oauth: this.$store.state.oauth,
+          status: this.status,
         });
         this.error = this.$store.state.toot.error;
         this.status = '';
       },
-      uploadFile(e) {
+      async uploadFile(e) {
         e.preventDefault();
         const file = e.target.files[0];
-        this.$store.dispatch('toot/uploadFile', {file: file});
-        // TODO:選択状態を空にして、添付された画像一覧を表示したい
-        this.file = '';
+        await this.$store.dispatch('toot/uploadFile', {
+          oauth: this.$store.state.oauth,
+          file: file
+        });
+        this.error = this.$store.state.toot.error;
+        e.target.value = '';// 未選択状態にする
       }
     },
     created() {
@@ -104,5 +117,21 @@
   .new-toot__status {
     width: 100%;
     height: 10em;
+  }
+
+  .medias {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    list-style: none;
+
+    & > * {
+      width: 25%;
+    }
+
+    img {
+      width: 100%;
+    }
   }
 </style>

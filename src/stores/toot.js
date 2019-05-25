@@ -1,15 +1,21 @@
 import axios from 'axios'
 
+// TODO:mediaも別のstoreに分けたい
 export default {
   namespaced: true,
   state: {
-    error: null
+    error: null,
+    medias: []
   },
   actions: {
     async create({ state }, {oauth, status}) {
-      const postParams = {
+      let postParams = {
         status: status,
       };
+
+      if(state.medias.length) {
+        postParams['media_ids'] = state.medias.map(media => media.id);
+      }
 
       // https://docs.joinmastodon.org/api/rest/statuses/
       try {
@@ -19,26 +25,27 @@ export default {
         state.error = null;
       } catch (error) {
         state.error = error;
+      } finally {
+        state.medias = [];
       }
     },
-    // TODO:メディアはidを配列で保存しないといけないからacountじゃなくてTootというvuexに分けた方がよさそう？
-    async uploadFile({state, commit}, {file}) {
+    async uploadFile({state}, {oauth, file}) {
       const formData = new FormData();
       formData.append('file', file);
 
       // https://docs.joinmastodon.org/api/rest/statuses/
       try {
-        await axios.post(`${state.mastodon_url}/api/v1/media`, formData, {
+        const response = await axios.post(`${oauth.mastodon_url}/api/v1/media`, formData, {
           headers: {
-            'Authorization': `Bearer ${state.token}`,
+            'Authorization': `Bearer ${oauth.token}`,
             'content-type': 'multipart/form-data'
           }
-        }).then(response => {
-          console.log(response.statusText);
-        })
+        });
+
+        state.medias.push(response.data);
+        state.error = null;
       } catch (error) {
-        commit('setError', error.response.data);
-        throw error.response.status;
+        state.error = error;
       }
     },
   }
