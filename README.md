@@ -2,6 +2,22 @@
 
 MastodonクライアントをVue Cliで作成
 
+## 使用ライブラリ
+
+```sh
+# ajax通信
+yarn add --dev axios
+
+# cookie操作
+yarn add --dev js-cookie
+
+# オブジェクトをGETパラメータにシリアライズ
+yarn add --dev qs
+
+# お絵かき
+yarn add --dev fabric
+```
+
 ## Project setup
 ```
 yarn install

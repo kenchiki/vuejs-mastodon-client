@@ -15,10 +15,12 @@
       <p>
         <input type="file" @change="uploadFile">
       </p>
-      <p>
-        <canvas id="canvas"></canvas>
+      <p class="canvas">
+        <!--TODO:コンポーネント化したい-->
+        <canvas id="canvas" width="400" height="300"></canvas>
       </p>
       <p>
+        <input type="button" value="お絵かきをクリア" v-on:click="clearCanvas">
         <input type="button" value="お絵かき画像アップ" v-on:click="uploadCanvas">
       </p>
       <p>
@@ -45,13 +47,15 @@
 <script>
   import {mapState} from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
+  import { fabric } from 'fabric';
 
   export default {
     mixins: [storageRestorable],
     data: function () {
       return {
         status: '',
-        error: null
+        error: null,
+        canvas: null
       }
     },
     computed: {
@@ -87,7 +91,28 @@
           canvas: document.getElementById('canvas')
         });
         this.error = this.$store.state.media.error;
+        this.clearCanvas();
       },
+      clearCanvas() {
+        this.canvas.clear();
+        this.fillCanvas();
+      },
+      fillCanvas() {
+        const rect = new fabric.Rect({
+          top : 0,
+          left : 0,
+          width : 500,
+          height : 300,
+          fill : '#ffffff'
+        });
+        this.canvas.add(rect);
+      },
+      setupCanvas() {
+        this.canvas.isDrawingMode = true;  // お絵かきモードの有効化
+        this.canvas.freeDrawingBrush.color = "#000000"; // 描画する線の色
+        this.canvas.freeDrawingBrush.width = 5;  // 描画する線の太さ
+        this.fillCanvas();
+      }
     },
     created() {
       this.$store.dispatch('timeline/fetchTimeline', {
@@ -98,10 +123,8 @@
       });
     },
     mounted() {
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'green';
-      ctx.fillRect(10, 10, 150, 100);
+      this.canvas = new fabric.Canvas('canvas');
+      this.setupCanvas();
     },
     destroyed() {
       this.$store.commit('timeline/disconnectSocket');
@@ -156,8 +179,10 @@
     }
   }
 
+  .canvas {
+    padding-left: 50px;
+  }
   #canvas {
-    width: 100%;
-    height: 300px;
+    border: 1px solid #000;
   }
 </style>
