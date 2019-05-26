@@ -16,6 +16,12 @@
         <input type="file" @change="uploadFile">
       </p>
       <p>
+        <canvas id="canvas"></canvas>
+      </p>
+      <p>
+        <input type="button" value="お絵かき画像アップ" v-on:click="uploadCanvas">
+      </p>
+      <p>
         <input type="button" value="トゥート！" v-on:click="createToot">
       </p>
     </div>
@@ -74,7 +80,14 @@
         });
         this.error = this.$store.state.media.error;
         e.target.value = '';// 未選択状態にする
-      }
+      },
+      async uploadCanvas() {
+        await this.$store.dispatch('media/uploadCanvas', {
+          oauth: this.$store.state.oauth,
+          canvas: document.getElementById('canvas')
+        });
+        this.error = this.$store.state.media.error;
+      },
     },
     created() {
       this.$store.dispatch('timeline/fetchTimeline', {
@@ -83,6 +96,12 @@
       this.$store.dispatch('timeline/streamingTimeline', {
         oauth: this.$store.state.oauth,
       });
+    },
+    mounted() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'green';
+      ctx.fillRect(10, 10, 150, 100);
     },
     destroyed() {
       this.$store.commit('timeline/disconnectSocket');
@@ -135,5 +154,10 @@
     img {
       width: 100%;
     }
+  }
+
+  #canvas {
+    width: 100%;
+    height: 300px;
   }
 </style>
