@@ -3,13 +3,12 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: {
-    // TODO:tootsに変えたい
-    timeline: [],
+    toots: [],
     socket: null
   },
   mutations: {
-    setTimeline(state, timeline) {
-      state.timeline = timeline
+    setToots(state, toots) {
+      state.toots = toots
     },
     setSocket(state, socket) {
       state.socket = socket;
@@ -24,7 +23,7 @@ export default {
       axios.get(`${oauth.mastodon_url}/api/v1/timelines/home`, {
         headers: {'Authorization': `Bearer ${oauth.token}`}
       }).then(response => {
-        commit('setTimeline', response.data);
+        commit('setToots', response.data);
       })
     },
     streamingTimeline({commit, state}, { oauth }) {
@@ -33,7 +32,7 @@ export default {
       socket.addEventListener('message', function (event) {
         const response = JSON.parse(event.data);
         if (response.event === 'update') {
-          state.timeline.unshift(JSON.parse(response.payload));
+          state.toots.unshift(JSON.parse(response.payload));
           console.log('Message from server ', response);
         }
       });

@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 
 const API_SCOPE = 'read write';
 const DEFAULT_MASTODON_URL = 'http://localhost:3000';
+const APP_NAME = '銀河マンモス';
 
 // client、tokenどちらを取得する際も同一のものを指定する必要あり（認証のところで無効と表示されてしまうため）
 const REDIRECT_URI = 'http://localhost:8081/callback';
@@ -63,9 +64,9 @@ export default {
     }
   },
   actions: {
-    async fetchClient({commit, state}, {mastodon_url}) {
+    async fetchClient({commit}, {mastodon_url}) {
       const postParams = {
-        client_name: 'vue test',
+        client_name: APP_NAME,
         redirect_uris: REDIRECT_URI,
         scopes: API_SCOPE
       };

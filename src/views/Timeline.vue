@@ -21,7 +21,7 @@
     </div>
 
     <ul class="toots">
-      <li v-for="toot in timeline" v-bind:key="toot.id">
+      <li v-for="toot in toots" v-bind:key="toot.id">
         <dl class="toots__toot">
           <dt class="toots__title">{{ toot.account.display_name }}</dt>
           <dd v-html="toot.content"></dd>
@@ -50,8 +50,8 @@
     },
     computed: {
       ...mapState({
-        timeline: state => state.timeline.timeline,
-        medias: state => state.toot.medias
+        toots: state => state.timeline.toots,
+        medias: state => state.media.medias
       })
     },
     methods: {
@@ -59,18 +59,20 @@
         await this.$store.dispatch('toot/create', {
           oauth: this.$store.state.oauth,
           status: this.status,
+          medias: this.$store.state.media.medias
         });
         this.error = this.$store.state.toot.error;
+        this.$store.commit('media/clearMedias');
         this.status = '';
       },
       async uploadFile(e) {
         e.preventDefault();
         const file = e.target.files[0];
-        await this.$store.dispatch('toot/uploadFile', {
+        await this.$store.dispatch('media/uploadFile', {
           oauth: this.$store.state.oauth,
           file: file
         });
-        this.error = this.$store.state.toot.error;
+        this.error = this.$store.state.media.error;
         e.target.value = '';// 未選択状態にする
       }
     },
