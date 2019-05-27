@@ -17,12 +17,11 @@ export default {
     code: '',
     token: '',
     mastodon_url: '',
-    error: {}
+    error: null
   },
   mutations: {
     setError(state, error) {
       state.error = error;
-      alert('エラー発生');
     },
     restoreStorage(state) {
       state.client_id = Cookies.get('client_id');
@@ -41,6 +40,7 @@ export default {
       Cookies.remove('client_id');
       Cookies.remove('client_secret');
       Cookies.remove('code');
+      Cookies.remove('token');
       Cookies.remove('mastodon_url');
     },
     setClient(state, { response, mastodon_url }) {
@@ -73,17 +73,13 @@ export default {
 
       // https://docs.joinmastodon.org/api/rest/apps/#post-api-v1-apps
       try {
-        await axios.post(`${mastodon_url}/api/v1/apps`, postParams)
-          .then(response => {
-            commit('setClient', {response: response.data, mastodon_url: mastodon_url});
-            return response.status;
-          })
+        const response = await axios.post(`${mastodon_url}/api/v1/apps`, postParams);
+        commit('setClient', {response: response.data, mastodon_url: mastodon_url});
       } catch (error) {
-        commit('setError', error.response.data);
-        throw error.response.status;
+        commit('setError', error);
       }
     },
-    async fetchCode({state}) {
+    fetchCode({state}) {
       const getParams = {
         response_type: 'code',
         client_id: state.client_id,
@@ -106,14 +102,11 @@ export default {
       };
 
       try {
-        await axios.post(`${state.mastodon_url}/oauth/token`, postParams)
-          .then(response => {
-            commit('setToken', response.data.access_token);
-            return response.status;
-          })
+        const response = await axios.post(`${state.mastodon_url}/oauth/token`, postParams);
+        commit('setToken', response.data.access_token);
+        commit('setError', null);
       } catch (error) {
-        commit('setError', error.response.data);
-        throw error.response.status;
+        commit('setError', error);
       }
     }
   }

@@ -1,6 +1,9 @@
 <template>
   <div class="oauth">
     <h1>認証</h1>
+    <div class="error" v-if="error">
+      {{ error.response.data.error }}
+    </div>
     <p>
       <!--TODO:他のインスタンスにも繋げてソケットURLを取得したい-->
       <input type="text" v-model="mastodon_url">
@@ -25,11 +28,16 @@
 
   export default {
     mixins: [storageRestorable],
+    data: function () {
+      return {
+        error: null
+      }
+    },
     computed: {
       ...mapState({
         client_id: state => state.oauth.client_id,
         code: state => state.oauth.code,
-        token: state => state.oauth.token,
+        token: state => state.oauth.token
       }),
       mastodon_url: {
         get () {
@@ -41,29 +49,23 @@
       }
     },
     methods: {
-      fetchClient() {
+      async fetchClient() {
         this.$store.dispatch('oauth/fetchClient', { mastodon_url: this.mastodon_url }).then(statusCode => {
           console.log(statusCode);
-          alert('クライアント取得完了');
         });
       },
-      fetchCode() {
+      async fetchCode() {
         this.$store.dispatch('oauth/fetchCode').then(statusCode => {
           console.log(statusCode);
-          alert('コード取得完了');
         });
       },
       clearStorage() {
         this.$store.commit('oauth/clearStorage');
-        this.$store.commit('account/clearStorage');
         alert('ストレージ削除');
       },
-      fetchToken() {
-        this.$store.dispatch('oauth/fetchToken').then(statusCode => {
-          this.$store.commit('account/setOauth', this.$store.state.oauth);
-          console.log(statusCode);
-          alert('トークン取得完了');
-        });
+      async fetchToken() {
+        await this.$store.dispatch('oauth/fetchToken');
+        this.error = this.$store.state.oauth.error;
       }
     }
   }

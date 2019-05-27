@@ -46,14 +46,6 @@
         this.fill();
       }
     },
-    created() {
-      this.$store.dispatch('timeline/fetchTimeline', {
-        oauth: this.$store.state.oauth,
-      });
-      this.$store.dispatch('timeline/streamingTimeline', {
-        oauth: this.$store.state.oauth,
-      });
-    },
     mounted() {
       this.canvas = new fabric.Canvas('canvas');
       this.setup();
