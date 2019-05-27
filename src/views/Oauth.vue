@@ -2,6 +2,7 @@
   <div class="oauth">
     <h1>認証</h1>
     <p>
+      <!--TODO:他のインスタンスにも繋げてソケットURLを取得したい-->
       <input type="text" v-model="mastodon_url">
     </p>
     <p>

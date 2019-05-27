@@ -15,14 +15,9 @@
       <p>
         <input type="file" @change="uploadFile">
       </p>
-      <p class="canvas">
-        <!--TODO:コンポーネント化したい-->
-        <canvas id="canvas" width="400" height="300"></canvas>
-      </p>
-      <p>
-        <input type="button" value="お絵かきをクリア" v-on:click="clearCanvas">
-        <input type="button" value="お絵かき画像アップ" v-on:click="uploadCanvas">
-      </p>
+
+      <Drawing v-on:drew="uploadCanvas" />
+
       <p>
         <input type="button" value="トゥート！" v-on:click="createToot">
       </p>
@@ -47,7 +42,7 @@
 <script>
   import {mapState} from 'vuex';
   import storageRestorable from '../mixins/storage_restorable.js'
-  import { fabric } from 'fabric';
+  import Drawing from '@/components/Drawing.vue'
 
   export default {
     mixins: [storageRestorable],
@@ -55,8 +50,10 @@
       return {
         status: '',
         error: null,
-        canvas: null
       }
+    },
+    components: {
+      Drawing
     },
     computed: {
       ...mapState({
@@ -85,34 +82,13 @@
         this.error = this.$store.state.media.error;
         e.target.value = '';// 未選択状態にする
       },
-      async uploadCanvas() {
+      async uploadCanvas(canvas) {
         await this.$store.dispatch('media/uploadCanvas', {
           oauth: this.$store.state.oauth,
-          canvas: document.getElementById('canvas')
+          canvas: canvas
         });
         this.error = this.$store.state.media.error;
-        this.clearCanvas();
       },
-      clearCanvas() {
-        this.canvas.clear();
-        this.fillCanvas();
-      },
-      fillCanvas() {
-        const rect = new fabric.Rect({
-          top : 0,
-          left : 0,
-          width : 500,
-          height : 300,
-          fill : '#ffffff'
-        });
-        this.canvas.add(rect);
-      },
-      setupCanvas() {
-        this.canvas.isDrawingMode = true;  // お絵かきモードの有効化
-        this.canvas.freeDrawingBrush.color = "#000000"; // 描画する線の色
-        this.canvas.freeDrawingBrush.width = 5;  // 描画する線の太さ
-        this.fillCanvas();
-      }
     },
     created() {
       this.$store.dispatch('timeline/fetchTimeline', {
@@ -121,10 +97,6 @@
       this.$store.dispatch('timeline/streamingTimeline', {
         oauth: this.$store.state.oauth,
       });
-    },
-    mounted() {
-      this.canvas = new fabric.Canvas('canvas');
-      this.setupCanvas();
     },
     destroyed() {
       this.$store.commit('timeline/disconnectSocket');
@@ -177,12 +149,5 @@
     img {
       width: 100%;
     }
-  }
-
-  .canvas {
-    padding-left: 50px;
-  }
-  #canvas {
-    border: 1px solid #000;
   }
 </style>
