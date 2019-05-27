@@ -17,6 +17,7 @@ export default {
     code: '',
     token: '',
     mastodon_url: '',
+    streaming_url: '',
     error: null
   },
   mutations: {
@@ -28,6 +29,7 @@ export default {
       state.client_secret = Cookies.get('client_secret');
       state.code = Cookies.get('code');
       state.token = Cookies.get('token');
+      state.streaming_url = Cookies.get('streaming_url');
       state.mastodon_url = Cookies.get('mastodon_url') || DEFAULT_MASTODON_URL;
       console.log('ストレージ復元');
     },
@@ -35,15 +37,17 @@ export default {
       state.client_id = '';
       state.client_secret = '';
       state.code = '';
-      state.token = '';
+      state.streaming_url = '';
       state.mastodon_url = DEFAULT_MASTODON_URL;
+      state.token = '';
       Cookies.remove('client_id');
       Cookies.remove('client_secret');
       Cookies.remove('code');
       Cookies.remove('token');
+      Cookies.remove('streaming_url');
       Cookies.remove('mastodon_url');
     },
-    setClient(state, { response, mastodon_url }) {
+    setClient(state, {response, mastodon_url}) {
       state.client_id = response.client_id;
       state.client_secret = response.client_secret;
       state.mastodon_url = mastodon_url;
@@ -59,8 +63,12 @@ export default {
       state.token = token;
       Cookies.set('token', token);
     },
-    updateMastodonUrl(state, mastodon_url) {
+    setMastodonUrl(state, mastodon_url) {
       state.mastodon_url = mastodon_url;
+    },
+    setStreamingUrl(state, streaming_url) {
+      state.streaming_url = streaming_url;
+      Cookies.set('streaming_url', streaming_url);
     }
   },
   actions: {
@@ -104,6 +112,17 @@ export default {
       try {
         const response = await axios.post(`${state.mastodon_url}/oauth/token`, postParams);
         commit('setToken', response.data.access_token);
+        commit('setError', null);
+      } catch (error) {
+        commit('setError', error);
+      }
+    },
+    async fetchInstance({commit, state}) {
+      try {
+        const response = await axios.get(`${state.mastodon_url}/api/v1/instance`, {
+          headers: {'Authorization': `Bearer ${state.token}`}
+        });
+        commit('setStreamingUrl', response.data.urls.streaming_api);
         commit('setError', null);
       } catch (error) {
         commit('setError', error);

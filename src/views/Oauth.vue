@@ -5,19 +5,22 @@
       {{ error.response.data.error }}
     </div>
     <p>
-      <!--TODO:他のインスタンスにも繋げてソケットURLを取得したい-->
       <input type="text" v-model="mastodon_url">
     </p>
     <p>
       <input type="button" value="クライアント取得" v-on:click="fetchClient">
       <input type="button" value="コード取得" v-on:click="fetchCode">
       <input type="button" value="トークン取得" v-on:click="fetchToken">
+      <input type="button" value="インスタンス情報取得" v-on:click="fetchInstance">
+    </p>
+    <p>
       <input type="button" value="認証情報を削除" v-on:click="clearStorage">
     </p>
     <ul>
       <li v-show="client_id">client ok!</li>
       <li v-show="code">code ok!</li>
       <li v-show="token">token ok!</li>
+      <li v-show="streaming_url">streaming_url ok!</li>
     </ul>
   </div>
 </template>
@@ -37,34 +40,34 @@
       ...mapState({
         client_id: state => state.oauth.client_id,
         code: state => state.oauth.code,
-        token: state => state.oauth.token
+        token: state => state.oauth.token,
+        streaming_url: state => state.oauth.streaming_url
       }),
       mastodon_url: {
         get () {
           return this.$store.state.oauth.mastodon_url
         },
         set (value) {
-          this.$store.commit('oauth/updateMastodonUrl', value);
+          this.$store.commit('oauth/setMastodonUrl', value);
         }
       }
     },
     methods: {
       async fetchClient() {
-        this.$store.dispatch('oauth/fetchClient', { mastodon_url: this.mastodon_url }).then(statusCode => {
-          console.log(statusCode);
-        });
+        await this.$store.dispatch('oauth/fetchClient', { mastodon_url: this.mastodon_url });
       },
       async fetchCode() {
-        this.$store.dispatch('oauth/fetchCode').then(statusCode => {
-          console.log(statusCode);
-        });
+        await this.$store.dispatch('oauth/fetchCode');
       },
       clearStorage() {
         this.$store.commit('oauth/clearStorage');
-        alert('ストレージ削除');
       },
       async fetchToken() {
         await this.$store.dispatch('oauth/fetchToken');
+        this.error = this.$store.state.oauth.error;
+      },
+      async fetchInstance() {
+        await this.$store.dispatch('oauth/fetchInstance');
         this.error = this.$store.state.oauth.error;
       }
     }
